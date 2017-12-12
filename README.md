@@ -74,7 +74,7 @@ kubectl apply -f fluentd-daemonset-elasticsearch.yaml
 
 get an example
 ```
-wget ttps://raw.githubusercontent.com/coreos/blog-examples/master/monitoring-kubernetes-with-prometheus/prometheus.yml
+wget https://raw.githubusercontent.com/coreos/blog-examples/master/monitoring-kubernetes-with-prometheus/prometheus.yml
 ```
 
 inject in metadata the correct namespace 
