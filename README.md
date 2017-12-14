@@ -85,5 +85,5 @@ test and verify
 ```
 kubectl get pods -l app=prometheus -o name -n logmon-system | \
 	sed 's/^.*\///' | \
-	xargs -I{} kubectl port-forward {} 9090:9090
+	xargs -I{} kubectl port-forward {} 9090:9090 -n logmon-system
 ```

@@ -13,6 +13,7 @@ spec:
       labels:
         app: prometheus
     spec:
+      serviceAccountName: prometheus    
       containers:
       - image: quay.io/prometheus/prometheus:v1.0.1
         name: prometheus
