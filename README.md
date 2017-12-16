@@ -25,27 +25,33 @@ kubectl create namespace logmon-system
 
 Daemonset exports logs in for instance /var/log/containers/*.log to a centralized place, in this case, elasticsearch.  
 
+```
 cd fluentd/
 kubectl apply -f rbac.yml
 kubectl apply -f configmap.yml
 kubectl apply -f fluent-es-ds.yml
+```
 
 ## elasticsearch
 
 Statefulset to handle the ingestion of logs being passed from fluentd
 
+```
 cd elasticsearch/
 kubectl apply -f rbac.yml
 kubectl apply -f elasticsearch.yml
 kubectl apply -f service.yml
+```
 
 ## kibana
 
 Dashboard to elasticsearch 
 
+```
 cd kibana/
 kubectl apply -f kibana.yml
 kubectl apply -f service.yml
+```
 
 # Monitoring
 
@@ -58,6 +64,8 @@ Phase2 would be monitoring agents report metrics to an outside moritoring cluste
 
 prometheus takes advantage of /metrics described 
 
+```
 cd prometheus/
 kubectl apply -f rbac.yml
 kubectl apply -f prometheus.yml
+```
