@@ -32,7 +32,7 @@ spec:
         command:
         - sh
         - -c
-        - chown -R 1000:1000 /var/log  /var/lib/docker/containers
+        - chown -R 1000:1000 /var/log
         securityContext:
           privileged: true
         volumeMounts:
