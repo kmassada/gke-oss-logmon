@@ -75,10 +75,8 @@ spec:
         volumeMounts:
         - name: varlog
           mountPath: /var/log
-          type: ""
         - name: varlibdockercontainers
           mountPath: /var/lib/docker/containers
-          type: ""
         - name: config-volume
           mountPath: /etc/fluent/config.d
       terminationGracePeriodSeconds: 30
