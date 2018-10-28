@@ -12,6 +12,11 @@ spec:
     matchLabels:
       k8s-app: kibana-logging
       version: v6.4.2
+  tolerations:
+  - key: dedicated
+    operator: Equal
+    value: kibana
+    effect: NoSchedule
   template:
     metadata:
       labels:
@@ -24,11 +29,11 @@ spec:
         resources:
           # need more cpu upon initialization, therefore burstable class
           limits:
-            cpu: 1000m
-            memory: 600Mi
+            cpu: 1500m
+            memory: 2500Mi
           requests:
-            cpu: 100m
-            memory: 300Mi
+            cpu: 500m
+            memory: 2000Mi
         env:
           - name: ELASTICSEARCH_URL
             value: http://elasticsearch-logging:9200
