@@ -3,8 +3,6 @@ kind: Service
 metadata:
   name: elasticsearch-logging
   namespace: kube-system
-  labels:
-    service: elasticsearch-logging
 spec:
   clusterIP: None
   ports:
@@ -13,4 +11,5 @@ spec:
   - port: 9300
     name: node-to-node
   selector:
-    service: elasticsearch-logging
+    k8s-app: elasticsearch-logging
+    version: v6.3.0
