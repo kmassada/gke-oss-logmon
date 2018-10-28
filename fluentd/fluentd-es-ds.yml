@@ -1,61 +1,39 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: fluentd
+  name: fluentd-es
   namespace: kube-system
   labels:
-    k8s-app: fluentd-logging
-    version: v1
+    k8s-app: fluentd-es
+    version: v2.2.1
 spec:
+  selector:
+    matchLabels:
+      k8s-app: fluentd-es
+      version: v2.2.1
   template:
     metadata:
       labels:
-        k8s-app: fluentd-logging
-        version: v1
+        k8s-app: fluentd-es
+        version: v2.2.1
+      # This annotation ensures that fluentd does not get evicted if the node
+      # supports critical pod annotation based priority scheme.
+      # Note that this does not guarantee admission on the nodes (#40573).
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ''
+        seccomp.security.alpha.kubernetes.io/pod: 'docker/default'
     spec:
-      serviceAccountName: fluentd
-      initContainers:
-      # This is to fix the permission on the volume
-      - name: fix-the-volume-permission
-        image: busybox
-        command:
-        - sh
-        - -c
-        - chown -R 1000:1000 /var/log
-        securityContext:
-          privileged: true
-        volumeMounts:
-        - name: varlog
-          mountPath: /var/log
+      priorityClassName: system-node-critical
+      serviceAccountName: fluentd-es
       containers:
-      - name: fluentd
-        image: fluent/fluentd-kubernetes-daemonset:elasticsearch
+      - name: fluentd-es
+        image: k8s.gcr.io/fluentd-elasticsearch:v2.2.0
         env:
-          - name:  FLUENT_ELASTICSEARCH_HOST
-            value: "elasticsearch-logging"
-          - name:  FLUENT_ELASTICSEARCH_PORT
-            value: "9200"
-          - name: FLUENT_ELASTICSEARCH_SCHEME
-            value: "http"
-          # Option to configure elasticsearch plugin with self signed certs
-          # ================================================================
-          - name: FLUENT_ELASTICSEARCH_SSL_VERIFY
-            value: "true"
-          # X-Pack Authentication
-          # =====================
-          - name: FLUENT_ELASTICSEARCH_USER
-            value: "elastic"
-          - name: FLUENT_ELASTICSEARCH_PASSWORD
-            value: "changeme"
-          # Logz.io Authentication
-          # ======================
-          - name: LOGZIO_TOKEN
-            value: "ThisIsASuperLongToken"
-          - name: LOGZIO_LOGTYPE
-            value: "kubernetes"
+        - name: FLUENTD_ARGS
+          value: --no-supervisor -q
         resources:
           limits:
-            memory: 200Mi
+            memory: 500Mi
           requests:
             cpu: 100m
             memory: 200Mi
@@ -65,16 +43,16 @@ spec:
         - name: varlibdockercontainers
           mountPath: /var/lib/docker/containers
           readOnly: true
+        - name: config-volume
+          mountPath: /etc/fluent/config.d
       terminationGracePeriodSeconds: 30
       volumes:
-      - hostPath:
+      - name: varlog
+        hostPath:
           path: /var/log
-          type: ""
-        name: varlog
-      - hostPath:
+      - name: varlibdockercontainers
+        hostPath:
           path: /var/lib/docker/containers
-          type: ""
-        name: varlibdockercontainers
-      - configMap:
-          name: fluentd-es-config-v1
-        name: config-volume
+      - name: config-volume
+        configMap:
+          name: fluentd-es-config-v0.1.6
