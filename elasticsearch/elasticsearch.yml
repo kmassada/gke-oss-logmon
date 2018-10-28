@@ -5,23 +5,23 @@ metadata:
   namespace: kube-system
   labels:
     k8s-app: elasticsearch-logging
-    version: v6.3.0
+    version: v6.4.2
 spec:
   serviceName: elasticsearch-logging
   replicas: 2
   selector:
     matchLabels:
       k8s-app: elasticsearch-logging
-      version: v6.3.0
+      version: v6.4.2
   template:
     metadata:
       labels:
         k8s-app: elasticsearch-logging
-        version: v6.3.0
+        version: v6.4.2
     spec:
       serviceAccountName: elasticsearch-logging
       containers:
-      - image: k8s.gcr.io/elasticsearch:v6.3.0
+      - image: k8s.gcr.io/elasticsearch:v6.4.2
         name: elasticsearch-logging
         resources:
           # need more cpu upon initialization, therefore burstable class
