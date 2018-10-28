@@ -25,8 +25,10 @@ spec:
           # need more cpu upon initialization, therefore burstable class
           limits:
             cpu: 1000m
+            memory: 600Mi
           requests:
             cpu: 100m
+            memory: 300Mi
         env:
           - name: ELASTICSEARCH_URL
             value: http://elasticsearch-logging:9200
