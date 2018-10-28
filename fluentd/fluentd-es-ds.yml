@@ -32,7 +32,7 @@ spec:
         command:
         - sh
         - -c
-        - chown -R 1000:1000 /var/log
+        - chown -R 1000:1000 /var/log  /var/lib/docker/containers
         securityContext:
           privileged: true
         volumeMounts:
@@ -75,9 +75,10 @@ spec:
         volumeMounts:
         - name: varlog
           mountPath: /var/log
+          type: ""
         - name: varlibdockercontainers
           mountPath: /var/lib/docker/containers
-          readOnly: true
+          type: ""
         - name: config-volume
           mountPath: /etc/fluent/config.d
       terminationGracePeriodSeconds: 30
