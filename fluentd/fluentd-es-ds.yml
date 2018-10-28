@@ -14,6 +14,19 @@ spec:
         version: v1
     spec:
       serviceAccountName: fluentd
+      initContainers:
+      # This is to fix the permission on the volume
+      - name: fix-the-volume-permission
+        image: busybox
+        command:
+        - sh
+        - -c
+        - chown -R 1000:1000 /var/log
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: varlog
+          mountPath: /var/log
       containers:
       - name: fluentd
         image: fluent/fluentd-kubernetes-daemonset:elasticsearch
