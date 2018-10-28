@@ -441,4 +441,4 @@ data:
 kind: ConfigMap
 metadata:
   name: fluentd-es-config-v1
-  namespace: logmon-system
+  namespace: kube-system
