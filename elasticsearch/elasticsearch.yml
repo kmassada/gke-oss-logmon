@@ -18,6 +18,7 @@ spec:
       labels:
         k8s-app: elasticsearch-logging
         version: v6.3.0
+        kubernetes.io/cluster-service: "true"
     spec:
       serviceAccountName: elasticsearch-logging
       containers:
