@@ -25,7 +25,7 @@ spec:
         effect: NoSchedule
       containers:
       - name: kibana-logging
-        image: docker.elastic.co/kibana/kibana:6.4.2
+        image: docker.elastic.co/kibana/kibana:6.3.2
         resources:
           # need more cpu upon initialization, therefore burstable class
           limits:
