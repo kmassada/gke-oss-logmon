@@ -25,12 +25,47 @@ spec:
     spec:
       priorityClassName: system-node-critical
       serviceAccountName: fluentd-es
+      initContainers:
+      # This is to fix the permission on the volume
+      - name: fix-the-volume-permission
+        image: busybox
+        command:
+        - sh
+        - -c
+        - chown -R 1000:1000 /var/log
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: varlog
+          mountPath: /var/log
       containers:
       - name: fluentd-es
-        image: k8s.gcr.io/fluentd-elasticsearch:v2.2.0
+        image: fluent/fluentd-kubernetes-daemonset:elasticsearch
         env:
-        - name: FLUENTD_ARGS
-          value: --no-supervisor -q
+          - name: FLUENTD_ARGS
+            value: --no-supervisor -q
+          - name:  FLUENT_ELASTICSEARCH_HOST
+            value: "elasticsearch-logging"
+          - name:  FLUENT_ELASTICSEARCH_PORT
+            value: "9200"
+          - name: FLUENT_ELASTICSEARCH_SCHEME
+            value: "http"
+          # Option to configure elasticsearch plugin with self signed certs
+          # ================================================================
+          - name: FLUENT_ELASTICSEARCH_SSL_VERIFY
+            value: "true"
+          # X-Pack Authentication
+          # =====================
+          - name: FLUENT_ELASTICSEARCH_USER
+            value: "elastic"
+          - name: FLUENT_ELASTICSEARCH_PASSWORD
+            value: "changeme"
+          # Logz.io Authentication
+          # ======================
+          - name: LOGZIO_TOKEN
+            value: "ThisIsASuperLongToken"
+          - name: LOGZIO_LOGTYPE
+            value: "kubernetes"
         resources:
           limits:
             memory: 500Mi
