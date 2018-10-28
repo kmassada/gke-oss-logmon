@@ -1,38 +1,52 @@
-apiVersion: apps/v1beta2
+apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
-  name: fluentd-es-v2.0.2
-  namespace: logmon-system
+  name: fluentd
+  namespace: kube-system
   labels:
-    k8s-app: fluentd-es
-    version: v2.0.2
+    k8s-app: fluentd-logging
+    version: v1
+    kubernetes.io/cluster-service: "true"
 spec:
-  selector:
-    matchLabels:
-      k8s-app: fluentd-es
-      version: v2.0.2
   template:
     metadata:
       labels:
-        k8s-app: fluentd-es
+        k8s-app: fluentd-logging
+        version: v1
         kubernetes.io/cluster-service: "true"
-        version: v2.0.2
-      # This annotation ensures that fluentd does not get evicted if the node
-      # supports critical pod annotation based priority scheme.
-      # Note that this does not guarantee admission on the nodes (#40573).
-      annotations:
-        scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
-      serviceAccountName: fluentd-es
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
       containers:
-      - name: fluentd-es
-        image: gcr.io/google-containers/fluentd-elasticsearch:v2.0.2
+      - name: fluentd
+        image: fluent/fluentd-kubernetes-daemonset:elasticsearch
         env:
-        - name: FLUENTD_ARGS
-          value: --no-supervisor -q
+          - name:  FLUENT_ELASTICSEARCH_HOST
+            value: "elasticsearch-logging"
+          - name:  FLUENT_ELASTICSEARCH_PORT
+            value: "9200"
+          - name: FLUENT_ELASTICSEARCH_SCHEME
+            value: "http"
+          # Option to configure elasticsearch plugin with self signed certs
+          # ================================================================
+          - name: FLUENT_ELASTICSEARCH_SSL_VERIFY
+            value: "true"
+          # X-Pack Authentication
+          # =====================
+          - name: FLUENT_ELASTICSEARCH_USER
+            value: "elastic"
+          - name: FLUENT_ELASTICSEARCH_PASSWORD
+            value: "changeme"
+          # Logz.io Authentication
+          # ======================
+          - name: LOGZIO_TOKEN
+            value: "ThisIsASuperLongToken"
+          - name: LOGZIO_LOGTYPE
+            value: "kubernetes"
         resources:
           limits:
-            memory: 500Mi
+            memory: 200Mi
           requests:
             cpu: 100m
             memory: 200Mi
@@ -42,25 +56,16 @@ spec:
         - name: varlibdockercontainers
           mountPath: /var/lib/docker/containers
           readOnly: true
-        - name: libsystemddir
-          mountPath: /host/lib
-          readOnly: true
-        - name: config-volume
-          mountPath: /etc/fluent/config.d
-      nodeSelector:
-        beta.kubernetes.io/fluentd-ds-ready: "true"
       terminationGracePeriodSeconds: 30
       volumes:
-      - name: varlog
-        hostPath:
+      - hostPath:
           path: /var/log
-      - name: varlibdockercontainers
-        hostPath:
+          type: ""
+        name: varlog
+      - hostPath:
           path: /var/lib/docker/containers
-      # It is needed to copy systemd library to decompress journals
-      - name: libsystemddir
-        hostPath:
-          path: /usr/lib64
-      - name: config-volume
-        configMap:
-          name: fluentd-es-config-v0.1.1
+          type: ""
+        name: varlibdockercontainers
+      - configMap:
+          name: fluentd-es-config-v1
+        name: config-volume
