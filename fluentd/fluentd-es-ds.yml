@@ -87,12 +87,15 @@ spec:
       volumes:
       - name: varlog
         hostPath:
+          type: "" 
           path: /var/log
       - name: varlibdockercontainers
         hostPath:
+          type: "" 
           path: /var/lib/docker/containers
       - name: libsystemddir
         hostPath:
+          type: "" 
           path: /usr/lib64
       - name: config-volume
         configMap:
