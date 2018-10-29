@@ -6,15 +6,13 @@ metadata:
   labels:
     k8s-app: fluent-bit-logging
     version: v1
-    kubernetes.io/cluster-service: "true"
 spec:
   template:
     metadata:
       labels:
         k8s-app: fluent-bit-logging
         version: v1
-        kubernetes.io/cluster-service: "true"
-    spec:
+        spec:
       containers:
       - name: fluent-bit
         image: fluent/fluent-bit:0.14.3
